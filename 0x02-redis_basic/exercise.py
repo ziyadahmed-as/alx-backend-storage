@@ -41,6 +41,22 @@ class Cache:
         if data is None:
             return None
         return fn(data) if fn else data
+    def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, None]:
+        """Retrieve a value from Redis and optionally apply a conversion function."""
+        value = self._redis.get(key)
+        if value is None:
+            return None
+        if fn:
+            return fn(value)
+        return value
+
+    def get_str(self, key: str) -> str:
+        """Retrieve a string value from Redis."""
+        return self.get(key, fn=lambda d: d.decode('utf-8'))
+
+    def get_int(self, key: str) -> int:
+        """Retrieve an int value from Redis."""
+        return self.get(key, fn=int)
 
     def get_str(self, key: str) -> Optional[str]:
         """Retrieve a string from Redis.
